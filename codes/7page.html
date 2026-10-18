@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
         * {
             box-sizing: border-box;
         }
+
         body {
             background-color: #101010;
             color: #c5c1b8;
@@ -22,6 +24,7 @@
             align-items: center;
             min-height: 100vh;
         }
+
         .document {
             max-width: 750px;
             width: 100%;
@@ -31,6 +34,7 @@
             background-color: #151515;
             box-shadow: 0 0 35px rgba(0, 0, 0, 0.9);
         }
+
         .program-header {
             font-size: 13px;
             color: #888;
@@ -38,6 +42,7 @@
             letter-spacing: 2px;
             margin: 0 0 6px;
         }
+
         .doc-title {
             text-align: center;
             letter-spacing: 2px;
@@ -46,6 +51,7 @@
             margin: 0 0 10px;
             color: #e0ded9;
         }
+
         .case-meta {
             font-size: 12px;
             color: #888;
@@ -54,11 +60,13 @@
             justify-content: space-between;
             margin: 0 0 8px;
         }
+
         hr {
             border: 0;
             border-top: 1px solid #444;
             margin: 12px 0 20px;
         }
+
         .sub-header {
             text-align: center;
             font-weight: normal;
@@ -67,6 +75,7 @@
             margin: 0 0 15px;
             letter-spacing: 1px;
         }
+
         .image-wrapper {
             text-align: center;
             margin: 20px 0;
@@ -74,6 +83,7 @@
             padding: 10px;
             border: 1px solid #292929;
         }
+
         .case-image {
             max-width: 100%;
             max-height: 380px;
@@ -84,6 +94,7 @@
             user-select: none;
             -webkit-user-drag: none;
         }
+
         .narrative {
             font-size: 14px;
             line-height: 1.8;
@@ -91,9 +102,11 @@
             margin: 20px 0 10px;
             color: #bbb;
         }
+
         .narrative p {
             margin: 8px 0;
         }
+
         .choice-prompt {
             text-align: center;
             font-size: 12px;
@@ -101,6 +114,7 @@
             letter-spacing: 2px;
             margin: 20px 0 12px;
         }
+
         .choices-container {
             display: flex;
             justify-content: center;
@@ -108,6 +122,7 @@
             gap: 20px;
             margin: 15px 0 25px;
         }
+
         .btn-choice {
             color: #c5c1b8;
             text-decoration: none;
@@ -122,22 +137,26 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .btn-choice:hover {
             color: #fff;
             border-color: #aaa;
             background-color: #242424;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
         }
+
         .btn-anomaly:hover {
             border-color: #c94a4a;
             color: #ff8080;
             box-shadow: 0 0 15px rgba(201, 74, 74, 0.2);
         }
+
         .btn-normal:hover {
             border-color: #4ac967;
             color: #80ff9a;
             box-shadow: 0 0 15px rgba(74, 201, 103, 0.2);
         }
+
         .doc-footer {
             text-align: center;
             font-size: 11px;
@@ -148,6 +167,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- DOCUMENT -->
@@ -187,12 +207,12 @@
         <p class="choice-prompt">SELECT YOUR CLASSIFICATION</p>
 
         <div class="choices-container">
-            <a href="move1.html" class="btn-choice btn-anomaly" onclick="return handleChoice(event, 'ANOMALY')">
+            <a href="8page.html" class="btn-choice btn-anomaly" onclick="return handleChoice(event, 'ANOMALY')">
                 [ ANOMALY ]
             </a>
             <!-- True -->
 
-            <a href="move1.html" class="btn-choice btn-normal" onclick="return handleChoice(event, 'NORMAL')">
+            <a href="8page.html" class="btn-choice btn-normal" onclick="return handleChoice(event, 'NORMAL')">
                 [ NORMAL ]
             </a>
             <!-- False -->
@@ -211,10 +231,11 @@
     <script>
         function handleChoice(event, choice) {
             event.preventDefault();
-            UncannyTracker.recordChoice(7, choice, 'move1.html');
+            UncannyTracker.recordChoice(7, choice, '8page.html');
             return false;
         }
     </script>
 
 </body>
+
 </html>
