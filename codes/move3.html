@@ -1,9 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surveillance Motion Feed — Frame 3</title>
+
+    ```
     <style>
         body {
             margin: 0;
@@ -14,6 +18,7 @@
             justify-content: center;
             align-items: center;
         }
+
         img {
             max-width: 100%;
             max-height: 85vh;
@@ -21,25 +26,63 @@
             height: auto;
             object-fit: contain;
             display: block;
-            animation: flash 0.8s forwards;
+            opacity: 0;
         }
+
+        img.show {
+            animation: flash 2s forwards;
+        }
+
         @keyframes flash {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; }
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
         }
     </style>
+    ```
+
 </head>
+
 <body>
 
-    <img src="3.png" alt="Movement Feed 3">
+    ```
+    <img id="feedImage" src="3.png" alt="Movement Feed 3">
 
     <script>
-        setTimeout(function () {
-            window.location.href = "move4.html";
-        }, 1000);
+        const image = document.getElementById("feedImage");
+
+        function startSequence() {
+            image.classList.add("show");
+
+            setTimeout(function () {
+                window.location.href = "move4.html";
+            }, 2000);
+        }
+
+        if (image.complete && image.naturalWidth > 0) {
+            startSequence();
+        } else {
+            image.addEventListener("load", startSequence, { once: true });
+
+            image.addEventListener("error", function () {
+                console.error("Could not load 3.png. Check the image filename and path.");
+            }, { once: true });
+        }
     </script>
+    ```
 
 </body>
+
 </html>
