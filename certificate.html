@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Evaluation Certificate — Uncanny Test Program</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- PDF and Image Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 30px 15px 60px;
+            background-color: #0d0d0d;
+            color: #c5c1b8;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ACTIONS BAR (Buttons for Download & Retake) */
+        .actions-panel {
+            max-width: 760px;
+            width: 100%;
+            margin: 0 auto 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+        .action-btn {
+            background-color: #1a1a1a;
+            color: #ddd;
+            border: 1px solid #444;
+            padding: 12px 22px;
+            font-family: inherit;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            background-color: #282828;
+            border-color: #888;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+        }
+        .action-btn.primary {
+            background-color: #142e1b;
+            border-color: #2e6e3c;
+            color: #62e382;
+        }
+        .action-btn.primary:hover {
+            background-color: #1b3d24;
+            border-color: #4cd471;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(98, 227, 130, 0.3);
+        }
+
+        /* CERTIFICATE STYLING */
+        #certificateCard {
+            max-width: 760px;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0 auto;
+            padding: 40px 35px;
+            border: 2px solid #555047;
+            background-color: #151515;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.95);
+            position: relative;
+        }
+
+        /* Watermark / Seal */
+        .certificate-seal {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            border: 1px dashed #444;
+            padding: 6px 12px;
+            font-size: 10px;
+            color: #777;
+            letter-spacing: 2px;
+        }
+
+        .record-tag {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #888;
+            margin: 0 0 10px;
+        }
+        .candidate-name-display {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            overflow-wrap: anywhere;
+            margin: 10px 0 15px;
+            color: #f2ede4;
+            text-transform: uppercase;
+        }
+        hr.divider {
+            border: 0;
+            border-top: 1px solid #444;
+            margin: 20px 0;
+        }
+        .program-title {
+            font-size: 12px;
+            letter-spacing: 4px;
+            color: #888;
+            margin: 0 0 6px;
+        }
+        .certificate-heading {
+            font-size: 22px;
+            font-weight: normal;
+            letter-spacing: 2px;
+            color: #e0ded9;
+            margin: 0 0 15px;
+        }
+        .cert-statement {
+            font-size: 13px;
+            line-height: 1.8;
+            color: #aaa;
+            max-width: 580px;
+            margin: 0 auto 20px;
+        }
+
+        /* RESULTS BOX */
+        .results-box {
+            border: 1px solid #3d3d3d;
+            background-color: #111;
+            padding: 25px 20px;
+            margin: 25px 0;
+        }
+        .results-box-header {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #888;
+            margin: 0 0 15px;
+        }
+        .metric-label {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #999;
+            margin: 8px 0 4px;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 4px 0 12px;
+            letter-spacing: 2px;
+        }
+        .metric-value.found {
+            color: #55ff77;
+            text-shadow: 0 0 12px rgba(85, 255, 119, 0.2);
+        }
+        .metric-value.missed {
+            color: #ff5555;
+            text-shadow: 0 0 12px rgba(255, 85, 85, 0.2);
+        }
+        .sub-divider {
+            width: 60%;
+            border: 0;
+            border-top: 1px solid #333;
+            margin: 15px auto;
+        }
+        .classification-title {
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #f0ede6;
+            margin: 8px 0 0;
+        }
+
+        /* ADDITIONAL METADATA */
+        .records-table {
+            font-size: 12px;
+            text-align: left;
+            line-height: 2.2;
+            margin: 20px 0;
+            padding: 10px 15px;
+            background: #0f0f0f;
+            border-left: 2px solid #555047;
+        }
+        .records-table .status-pass {
+            color: #55ff77;
+            font-weight: bold;
+        }
+        .records-table .status-fail {
+            color: #ff5555;
+            font-weight: bold;
+        }
+
+        .auth-footer {
+            font-size: 11px;
+            color: #777;
+            line-height: 1.8;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+        .doc-ref {
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 2px;
+            margin-top: 15px;
+        }
+
+        /* PRINT OPTIMIZATION */
+        @media print {
+            body {
+                background-color: #fff !important;
+                color: #000 !important;
+                padding: 0 !important;
+            }
+            .actions-panel, #feedbackMsg {
+                display: none !important;
+            }
+            #certificateCard {
+                border: 2px solid #000 !important;
+                background-color: #fff !important;
+                color: #000 !important;
+                box-shadow: none !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 30px !important;
+            }
+            .results-box {
+                background-color: #f7f7f7 !important;
+                border: 1px solid #999 !important;
+            }
+            .metric-value.found, .metric-value.missed, .candidate-name-display, .classification-title {
+                color: #000 !important;
+                text-shadow: none !important;
+            }
+            .records-table {
+                background: #f7f7f7 !important;
+                border-left: 2px solid #000 !important;
+            }
+            .status-pass, .status-fail {
+                color: #000 !important;
+                font-weight: bold !important;
+            }
+        }
+
+        /* Toast notification */
+        #feedbackMsg {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #88c092;
+            letter-spacing: 1px;
+            min-height: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACTIONS BAR (Top controls for user) -->
+    <div class="actions-panel">
+        <button id="downloadPdfBtn" class="action-btn primary" onclick="exportCertificate('pdf')">
+            [ DOWNLOAD AS PDF ]
+        </button>
+        <button id="downloadPngBtn" class="action-btn" onclick="exportCertificate('png')">
+            [ DOWNLOAD AS IMAGE (PNG) ]
+        </button>
+        <button class="action-btn" onclick="window.print()">
+            [ PRINT / SAVE ]
+        </button>
+        <a href="1Alpha.html" class="action-btn" onclick="handleRetake(event)">
+            [ RETAKE TEST ]
+        </a>
+    </div>
+
+    <!-- CERTIFICATE -->
+    <div id="certificateCard">
+        <div class="certificate-seal">CONFIDENTIAL</div>
+
+        <!-- TEST TAKER -->
+        <p class="record-tag">TEST SUBJECT RECORD</p>
+
+        <h1 id="testTakerName" class="candidate-name-display" title="Click to edit name" onclick="promptEditName()">
+            [ TEST TAKER NAME ]
+        </h1>
+
+        <hr class="divider">
+
+        <!-- CERTIFICATE TITLE -->
+        <p class="program-title">UNCANNY TEST PROGRAM</p>
+
+        <h2 class="certificate-heading">CERTIFICATE OF EVALUATION</h2>
+
+        <p class="cert-statement">
+            This document officially certifies that the above-named subject has completed the designated anomaly recognition test under active surveillance protocols.
+        </p>
+
+        <!-- TEST RESULTS -->
+        <div class="results-box">
+            <p class="results-box-header">FINAL TEST RESULTS</p>
+
+            <p class="metric-label">TOTAL ANOMALIES FOUND</p>
+            <h2 id="anomaliesFound" class="metric-value found">0</h2>
+
+            <hr class="sub-divider">
+
+            <p class="metric-label">TOTAL ANOMALIES MISSED</p>
+            <h2 id="anomaliesMissed" class="metric-value missed">0</h2>
+
+            <hr class="sub-divider">
+
+            <p class="metric-label">FINAL CLASSIFICATION</p>
+            <h3 id="finalClassification" class="classification-title">[ FINAL CLASSIFICATION ]</h3>
+        </div>
+
+        <!-- ADDITIONAL RECORDS -->
+        <div class="records-table">
+            TEST ID: <span id="testIdVal" style="color: #fff;">[ TEST ID ]</span><br>
+            DATE OF EVALUATION: <span id="testDateVal" style="color: #fff;">[ DATE ]</span><br>
+            EVALUATION STATUS: <span id="testStatusVal">[ STATUS ]</span><br>
+            VERIFIED ACCURACY: <span id="accuracyVal" style="color: #fff;">[ ACCURACY ]</span>
+        </div>
+
+        <!-- AUTHORIZATION -->
+        <hr class="divider">
+
+        <p class="auth-footer">
+            AUTHORIZED DOCUMENT — UNCANNY TEST PROGRAM<br>
+            RESULTS HAVE BEEN PERMANENTLY RECORDED AND ARCHIVED.<br>
+            UNAUTHORIZED DISTRIBUTION OR TAMPERING IS STRICTLY PROHIBITED.
+        </p>
+
+        <p class="doc-ref">
+            DOCUMENT REF: UTP-EVAL-606 &nbsp;|&nbsp; ARCHIVE REV 1.666
+        </p>
+    </div>
+
+    <div id="feedbackMsg"></div>
+
+    <script src="tracker.js"></script>
+    <script>
+        function populateCertificate() {
+            var res = UncannyTracker.getResults();
+
+            // Name
+            document.getElementById('testTakerName').textContent = res.userName;
+
+            // Anomalies Found: specified in numbers
+            document.getElementById('anomaliesFound').textContent = res.anomaliesFound + " / " + res.totalAnomalies;
+
+            // Anomalies Missed: specified in numbers
+            document.getElementById('anomaliesMissed').textContent = res.anomaliesMissed + " / " + res.totalAnomalies;
+
+            // Classification
+            document.getElementById('finalClassification').textContent = res.classification;
+
+            // Metadata
+            document.getElementById('testIdVal').textContent = res.testId;
+            document.getElementById('testDateVal').textContent = res.testDate;
+
+            // Status
+            var statusEl = document.getElementById('testStatusVal');
+            statusEl.textContent = res.status;
+            if (res.isPassed) {
+                statusEl.className = 'status-pass';
+                statusEl.textContent = 'PASS — FULL CLEARANCE GRANTED';
+            } else {
+                statusEl.className = 'status-fail';
+                statusEl.textContent = 'FAIL — MISSED ' + res.anomaliesMissed + ' ANOMALIES';
+            }
+
+            // Accuracy
+            document.getElementById('accuracyVal').textContent = res.totalCorrect + ' / ' + res.totalCases + ' Cases Correct';
+        }
+
+        function promptEditName() {
+            var current = UncannyTracker.getUserName();
+            var updated = prompt("Update Candidate Name for Certificate:", current);
+            if (updated && updated.trim()) {
+                UncannyTracker.setUserName(updated.trim());
+                populateCertificate();
+            }
+        }
+
+        function handleRetake(event) {
+            if (confirm("Reset current test scores and retake the evaluation?")) {
+                UncannyTracker.resetTest();
+                window.location.href = "1Alpha.html";
+            } else {
+                event.preventDefault();
+            }
+        }
+
+        // Export as Image (PNG) or PDF
+        function exportCertificate(format) {
+            var msg = document.getElementById('feedbackMsg');
+            msg.textContent = "Generating official " + format.toUpperCase() + " certificate... Please wait.";
+
+            var card = document.getElementById('certificateCard');
+            var userName = UncannyTracker.getUserName().replace(/[^a-zA-Z0-9_-]/g, '_') || 'Subject';
+            var testId = (document.getElementById('testIdVal').textContent || '6700000').trim();
+
+            if (typeof html2canvas === 'undefined') {
+                msg.textContent = "Canvas library loading error. Using print mode instead.";
+                window.print();
+                return;
+            }
+
+            html2canvas(card, {
+                scale: 2, // High resolution
+                backgroundColor: '#151515',
+                useCORS: true,
+                logging: false
+            }).then(function (canvas) {
+                if (format === 'png') {
+                    var link = document.createElement('a');
+                    link.download = 'Uncanny_Certificate_' + userName + '_' + testId + '.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    msg.textContent = "Certificate image downloaded successfully.";
+                } else if (format === 'pdf') {
+                    if (window.jspdf && window.jspdf.jsPDF) {
+                        var { jsPDF } = window.jspdf;
+                        var imgData = canvas.toDataURL('image/png');
+                        var orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
+                        var pdf = new jsPDF({
+                            orientation: orientation,
+                            unit: 'px',
+                            format: [canvas.width / 2, canvas.height / 2]
+                        });
+                        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2);
+                        pdf.save('Uncanny_Certificate_' + userName + '_' + testId + '.pdf');
+                        msg.textContent = "PDF certificate downloaded successfully.";
+                    } else {
+                        // Fallback to print dialog
+                        msg.textContent = "Opening print dialog to save as PDF...";
+                        window.print();
+                    }
+                }
+            }).catch(function (err) {
+                console.error(err);
+                msg.textContent = "Export error. You may use browser Print / Save as PDF.";
+                window.print();
+            });
+        }
+
+        // Populate immediately on load
+        window.addEventListener('DOMContentLoaded', populateCertificate);
+    </script>
+
+</body>
+</html>
